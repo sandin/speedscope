@@ -23,7 +23,8 @@ interface PerfEvent {
 }
 
 function parseEvent(rawEvent: string): PerfEvent | null {
-  const lines = rawEvent.split('\n').filter(l => !/^\s*#/.exec(l))
+  let sp = rawEvent.indexOf('\r\n') != -1 ? '\r\n' : '\n';
+  const lines = rawEvent.split(sp).filter(l => !/^\s*#/.exec(l))
 
   const event: PerfEvent = {
     command: null,
@@ -84,7 +85,8 @@ export function importFromLinuxPerf(contents: string): ProfileGroup | null {
   const profiles = new Map<string, StackListProfileBuilder>()
 
   let eventType: string | null = null
-  const events = contents.split('\n\n').map(parseEvent)
+  let sp = contents.indexOf('\r\n') != -1 ? '\r\n' : '\n';
+  const events = contents.split(sp + sp).map(parseEvent)
 
   for (let event of events) {
     if (event == null) continue
